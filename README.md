@@ -1,10 +1,12 @@
-i spend too much time doomscrolling
+doomscrolling at 2am. 
+
 then i thought to myself:
 
 "doesn't x literally spend millions of dollars trying to engineer attention?
-and im falling for it."
+... im literally falling for their schemes..."
 
-hence this cinematic google extension that reminds you of your ridiculousness
+ 
+ so me produce this cinematic google extension that reminds you of your ridiculousness
 
 <img width="922" height="652" alt="Screenshot 2026-02-12 at 11 50 29 PM" src="https://github.com/user-attachments/assets/fe2be981-008f-434b-81f9-02a4eb89857c" />
 <img width="755" height="682" alt="Screenshot 2026-02-12 at 11 51 03 PM" src="https://github.com/user-attachments/assets/13958fd2-b169-4bf0-8d9f-f04e8be101f7" />
