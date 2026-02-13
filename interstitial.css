@@ -1,0 +1,1032 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Space Mono', monospace;
+  color: #e0e0e0;
+}
+
+/* ===================== OVERLAY ROOT ===================== */
+#overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #050510;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.5s ease-out;
+}
+
+#overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===================== FILM GRAIN ===================== */
+#grain-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  transition: opacity 0.6s ease;
+}
+
+#overlay.grain-surge #grain-canvas {
+  opacity: 0.3;
+}
+
+/* ===================== CINEMATIC LETTERBOX BARS ===================== */
+.letterbox {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 4.5vh;
+  background: #000;
+  z-index: 150;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.letterbox-top { top: 0; }
+.letterbox-bottom { bottom: 0; }
+
+/* Letterbox bars stay during collage — both scenes are dark now.
+   Slightly dimmed to let edge photos breathe */
+#overlay.collage-active .letterbox {
+  opacity: 0.7;
+  transition: opacity 0.8s ease;
+}
+
+/* Letterbox returns for dark acts */
+#overlay.letterbox-return .letterbox {
+  opacity: 1;
+  transition: opacity 0.5s ease 0.2s;
+}
+
+/* ===================== OVERLAY BACKGROUND STATES ===================== */
+/* Collage is now dark — no background swap needed. Keep grain subtle. */
+#overlay.collage-active {
+  background: #050510;
+  transition: background 0s;
+}
+
+/* Soften grain during collage — let the photos breathe */
+#overlay.collage-active #grain-canvas {
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+}
+
+/* Dark bg when collage exits */
+#overlay.collage-exiting {
+  background: #050510;
+  transition: background 0s;
+}
+
+/* ===================== SCENE BRIDGE ===================== */
+/* Solid black cover for seamless dark/light transitions.
+   Appears OVER everything, background swaps happen behind it. */
+#scene-bridge {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #050510;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#scene-bridge.active {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+/* ===================== GLITCH CANVAS & SCANLINES ===================== */
+#glitch-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+#overlay.act4-active #glitch-canvas { opacity: 0.15; }
+
+#scanlines {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0;
+  transition: opacity 1s ease-in;
+  animation: scanlineScroll 10s linear infinite;
+}
+
+#overlay.act4-active #scanlines { opacity: 1; }
+
+@keyframes scanlineScroll {
+  from { transform: translateY(0); }
+  to { transform: translateY(30px); }
+}
+
+/* ===================== SCENE MANAGEMENT ===================== */
+.act-scene {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.2s ease-in-out, visibility 0s linear 1.2s;
+  z-index: 2;
+}
+
+.act-scene.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1.2s ease-in-out, visibility 0s linear 0s;
+}
+
+/* Act 3: instant on/off — both scenes are dark so no bleed risk,
+   but keep instant to prevent any overlap artifacts */
+#act-3 {
+  transition: opacity 0s, visibility 0s;
+}
+#act-3.active {
+  transition: opacity 0.15s ease-out, visibility 0s linear 0s;
+}
+
+
+/* ===================== ACTS 1 & 2: Wojak Deterioration ===================== */
+
+.machine-text {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  color: #707080;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  opacity: 0;
+  transition: opacity 1.5s ease-in;
+  margin-bottom: 2rem;
+  position: relative;
+  text-shadow: 0 0 8px rgba(100, 100, 200, 0.3);
+  z-index: 3;
+}
+
+.machine-text.visible { opacity: 1; }
+
+.machine-text::before,
+.machine-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  transition: opacity 1.5s ease-in;
+}
+
+.machine-text.visible::before {
+  color: #0ff;
+  opacity: 0.3;
+  animation: glitch1 4s infinite linear alternate-reverse;
+}
+
+.machine-text.visible::after {
+  color: #f0f;
+  opacity: 0.2;
+  animation: glitch2 3s infinite linear alternate-reverse;
+}
+
+#wojak-stage {
+  position: relative;
+  width: min(500px, 70vw);
+  height: min(500px, 70vw);
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
+}
+
+.wojak-frame {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(0px) brightness(0.92);
+  transform: translate(0, 0) scale(1);
+  transition:
+    opacity 0.8s ease-in-out,
+    filter 0.8s ease-in-out,
+    transform 0.8s ease-in-out;
+}
+
+.wojak-frame.visible { opacity: 1; }
+
+.wojak-frame.morphing-out {
+  opacity: 0;
+  filter: blur(4px) brightness(0.7);
+  transform: translate(-3px, 1px) scale(1.02);
+}
+
+.wojak-frame.morphing-in {
+  filter: blur(3px) brightness(0.85);
+  transform: translate(2px, -1px) scale(0.99);
+}
+
+/* Ken Burns slow zoom while frame is settled — subtle, cinematic drift */
+.wojak-frame.settled {
+  filter: blur(0px) brightness(0.92);
+  transform: translate(0, 0) scale(1);
+  animation: kenBurns 6s ease-in-out forwards;
+}
+
+@keyframes kenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.06) translate(-1%, 1%); }
+}
+
+
+/* ===================== ACT 3: Beat-Synced Slideshow ===================== */
+/* Full-screen photos SLAM in on every beat — like a music video montage.
+   Each image fills the viewport, hits hard, then cuts to the next. */
+
+#act-3 {
+  background: #000;
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+/* The slideshow container — full viewport */
+#collage-surface {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 2;
+}
+
+/* Each slide — full-screen, stacked, starts invisible */
+.slide-frame {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  transform: scale(1.08);
+  will-change: transform, opacity;
+}
+
+/* SLAM IN — photo hits with impact */
+.slide-frame.slide-active {
+  opacity: 1;
+  transform: scale(1);
+  animation: slideSlam 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Ken Burns drift while active — subtle life to a still image */
+.slide-frame.slide-holding {
+  opacity: 1;
+  transform: scale(1);
+  animation: slideKenBurns 3s ease-in-out forwards;
+}
+
+/* Cut out — instant disappear */
+.slide-frame.slide-out {
+  opacity: 0;
+  transition: opacity 0s;
+}
+
+@keyframes slideSlam {
+  0% {
+    opacity: 0;
+    transform: scale(1.15);
+    filter: brightness(2) contrast(1.4);
+  }
+  40% {
+    opacity: 1;
+    filter: brightness(1.2) contrast(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: brightness(1) contrast(1);
+  }
+}
+
+@keyframes slideKenBurns {
+  0% { transform: scale(1.02) translate(0, 0); }
+  100% { transform: scale(1.06) translate(-0.5%, 0.3%); }
+}
+
+/* The full-screen image itself */
+.slide-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.2) contrast(1.08) brightness(0.92);
+}
+
+/* Brief white flash on each beat hit */
+.slide-flash {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.slide-flash.flash-active {
+  animation: beatFlash 0.2s ease-out forwards;
+}
+
+@keyframes beatFlash {
+  0% { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Vignette over the slideshow — cinematic framing */
+#act-3::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.3) 70%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* Slideshow fading out before scene cut */
+#collage-surface.fading-out .slide-frame {
+  opacity: 0 !important;
+  filter: blur(6px) brightness(0.3);
+  transition: opacity 1s ease-out, filter 1s ease-out;
+}
+
+/* Hope text — cinematic but cohesive with the rest of the extension.
+   Same Space Mono, same lowercase DNA — just bigger, bolder, more presence. */
+.hope-text {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(1.1rem, 2.8vw, 1.7rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  text-align: center;
+  max-width: min(750px, 85vw);
+  line-height: 1.9;
+  opacity: 0;
+  transform: translateX(-50%) translateY(16px);
+  transition: opacity 2.5s ease-in, transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: absolute;
+  bottom: 10vh;
+  left: 50%;
+  z-index: 50;
+  text-shadow:
+    0 0 40px rgba(0, 0, 0, 1),
+    0 0 80px rgba(0, 0, 0, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.hope-text.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+/* ===================== ACT 3.5: Hopeful Wojak ===================== */
+
+/* Instant on AND instant off — activated behind the bridge, no transition bleed */
+#act-hope {
+  background: #000;
+  transition: opacity 0s, visibility 0s;
+}
+#act-hope.active {
+  transition: opacity 0s, visibility 0s;
+}
+
+/* Warm radial glow behind the hopeful wojak — golden undertone */
+#act-hope::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -55%);
+  width: 700px; height: 700px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 200, 100, 0.06) 0%,
+    rgba(255, 180, 80, 0.03) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+#hope-wojak-stage {
+  position: relative;
+  width: min(500px, 70vw);
+  height: min(500px, 70vw);
+  overflow: hidden;
+  border-radius: 6px;
+  z-index: 2;
+  box-shadow:
+    0 0 60px rgba(255, 200, 100, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Hopeful wojak gets warm color treatment */
+#wojak-hopeful {
+  filter: brightness(0.95) saturate(1.15) contrast(1.05) sepia(0.08);
+}
+
+#hope-caption {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.14em;
+  text-align: center;
+  position: absolute;
+  bottom: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  text-shadow:
+    0 0 30px rgba(255, 200, 100, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transition: opacity 2s ease-in;
+  z-index: 5;
+}
+
+#hope-caption.visible { opacity: 1; }
+
+
+/* ===================== RUG-PULL EFFECTS ===================== */
+
+/* White flash */
+#overlay.hope-flash::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #fff;
+  z-index: 180;
+  animation: whiteFlash 0.9s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes whiteFlash {
+  0% { opacity: 0.95; }
+  30% { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Screen shake */
+#overlay.act4-shake {
+  animation: screenShake 0.4s ease-out;
+}
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-6px, 3px); }
+  20% { transform: translate(5px, -5px); }
+  30% { transform: translate(-4px, 2px); }
+  40% { transform: translate(4px, -3px); }
+  50% { transform: translate(-3px, 4px); }
+  60% { transform: translate(3px, -2px); }
+  70% { transform: translate(-2px, 2px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Color inversion flash */
+#overlay.invert-flash {
+  filter: invert(1);
+  transition: filter 0.08s ease;
+}
+
+#overlay.invert-flash-off {
+  filter: invert(0);
+  transition: filter 0.3s ease;
+}
+
+
+/* ===================== ACT 4: THE HAUNTING FIGURE ===================== */
+
+/* Red vignette — creeping dread around the edges */
+#act-4::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 40%,
+    rgba(80, 0, 0, 0.15) 70%,
+    rgba(40, 0, 0, 0.35) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: vignetteBreath 4s ease-in-out infinite alternate;
+}
+
+@keyframes vignetteBreath {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+#figure-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  opacity: 0;
+}
+
+#figure-container.entrance {
+  animation: figureEntrance 2.5s ease-out forwards;
+}
+
+@keyframes figureEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(1.2) translateY(-40px);
+    filter: blur(15px) brightness(3);
+  }
+  20% {
+    opacity: 0.5;
+    filter: blur(8px) brightness(2);
+  }
+  50% {
+    opacity: 0.85;
+    filter: blur(2px) brightness(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+#the-figure {
+  width: min(420px, 65vw);
+  height: min(420px, 65vw);
+  position: relative;
+  animation: figureHover 5s ease-in-out infinite;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+@keyframes figureHover {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* VR Wojak image styling */
+#wojak-haunting {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter:
+    brightness(0.65)
+    contrast(1.3)
+    saturate(0.4)
+    drop-shadow(0 0 30px rgba(200, 0, 0, 0.4))
+    drop-shadow(0 0 60px rgba(150, 0, 0, 0.15));
+  animation: hauntingPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes hauntingPulse {
+  0% {
+    filter:
+      brightness(0.65) contrast(1.3) saturate(0.4)
+      drop-shadow(0 0 30px rgba(200, 0, 0, 0.4))
+      drop-shadow(0 0 60px rgba(150, 0, 0, 0.15));
+  }
+  100% {
+    filter:
+      brightness(0.55) contrast(1.4) saturate(0.3)
+      drop-shadow(0 0 50px rgba(255, 0, 0, 0.6))
+      drop-shadow(0 0 90px rgba(200, 0, 0, 0.25));
+  }
+}
+
+
+/* ===================== MESSAGE TEXT ===================== */
+
+#message-container {
+  text-align: center;
+  max-width: 650px;
+  padding: 0 2rem;
+  opacity: 0;
+}
+
+#message-container.entrance {
+  animation: messageReveal 2.5s ease-out forwards;
+  animation-delay: 1s;
+}
+
+@keyframes messageReveal {
+  0% { opacity: 0; transform: translateY(25px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.glitch-text {
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 0 10px rgba(255, 50, 50, 0.5);
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+.glitch-text::before {
+  color: #ff3333;
+  z-index: -1;
+  animation: glitch1 3s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  color: #ff0066;
+  z-index: -2;
+  animation: glitch2 2s infinite linear alternate-reverse;
+}
+
+@keyframes glitch1 {
+  0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  92% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 1px); }
+  94% { clip-path: inset(50% 0 20% 0); transform: translate(3px, -1px); }
+  96% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, 2px); }
+  98% { clip-path: inset(40% 0 40% 0); transform: translate(2px, -2px); }
+}
+
+@keyframes glitch2 {
+  0%, 88%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  90% { clip-path: inset(60% 0 10% 0); transform: translate(2px, 1px); }
+  93% { clip-path: inset(30% 0 50% 0); transform: translate(-2px, -1px); }
+  95% { clip-path: inset(70% 0 5% 0); transform: translate(3px, 2px); }
+  97% { clip-path: inset(15% 0 65% 0); transform: translate(-3px, -2px); }
+}
+
+#message-sub {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #a0a0c0;
+  margin-top: 0.8rem;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  animation: messageReveal 2s ease-out forwards;
+  animation-delay: 2s;
+}
+
+#message-warning {
+  margin-top: 1.5rem;
+  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+  color: #ff6060;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  animation: messageReveal 2s ease-out forwards;
+  animation-delay: 3s;
+}
+
+.flicker { animation: flicker 4s infinite; }
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 1; }
+  52% { opacity: 0.15; }
+  54% { opacity: 1; }
+  56% { opacity: 0.4; }
+  58% { opacity: 1; }
+}
+
+
+/* ===================== ACT 5: TWITCH & DISSOLVE ===================== */
+
+#overlay.twitching #glitch-canvas { opacity: 0.6; }
+
+#overlay.twitching #wojak-haunting {
+  animation: figureGlitch 0.1s infinite;
+}
+
+@keyframes figureGlitch {
+  0% { transform: translate(0, 0); filter: brightness(0.65) contrast(1.3) saturate(0.4) hue-rotate(0deg); }
+  20% { transform: translate(-4px, 3px); filter: brightness(0.8) contrast(1.5) saturate(0.2) hue-rotate(90deg); }
+  40% { transform: translate(3px, -4px); filter: brightness(0.5) contrast(1.6) saturate(0.5) hue-rotate(180deg); }
+  60% { transform: translate(-3px, -2px); filter: brightness(0.9) contrast(1.2) saturate(0.1) hue-rotate(270deg); }
+  80% { transform: translate(4px, 2px); filter: brightness(0.6) contrast(1.4) saturate(0.3) hue-rotate(45deg); }
+  100% { transform: translate(0, 0); filter: brightness(0.65) contrast(1.3) saturate(0.4) hue-rotate(0deg); }
+}
+
+#overlay.twitching .glitch-text {
+  animation: textGlitchIntense 0.08s infinite;
+}
+
+@keyframes textGlitchIntense {
+  0% { transform: translate(0); }
+  25% { transform: translate(-6px, 3px) skewX(6deg); }
+  50% { transform: translate(6px, -3px) skewX(-4deg); }
+  75% { transform: translate(-4px, -4px) skewX(3deg); }
+  100% { transform: translate(0); }
+}
+
+/* Message text dissolves first — staggered breakup */
+#overlay.dissolving #message-container {
+  animation: dissolve 1.2s ease-out forwards;
+}
+
+/* Figure dissolves slightly after the text */
+#overlay.dissolving #the-figure {
+  animation: dissolve 2s ease-out 0.3s forwards;
+}
+
+@keyframes dissolve {
+  0% { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); }
+  30% { opacity: 0.7; filter: blur(3px) brightness(1.6); transform: scale(1.02); }
+  70% { opacity: 0.25; filter: blur(10px) brightness(2.2); transform: scale(1.06); }
+  100% { opacity: 0; filter: blur(25px) brightness(3); transform: scale(1.12); }
+}
+
+
+/* ===================== TIME-OF-DAY: LATE NIGHT ===================== */
+
+/* Deeper, more menacing red vignette */
+#overlay.time-late-night #act-4::after {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 30%,
+    rgba(120, 0, 0, 0.25) 60%,
+    rgba(60, 0, 0, 0.5) 100%
+  );
+}
+
+/* More intense glitch canvas */
+#overlay.time-late-night.act4-active #glitch-canvas { opacity: 0.25; }
+
+/* Heavier scanlines */
+#overlay.time-late-night.act4-active #scanlines {
+  opacity: 1;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.22) 0px,
+    rgba(0, 0, 0, 0.22) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* More intense twitching glitch */
+#overlay.time-late-night.twitching #glitch-canvas { opacity: 0.8; }
+
+/* Harsher screen shake — ±10px, longer */
+#overlay.time-late-night.act4-shake {
+  animation: screenShakeLateNight 0.5s ease-out;
+}
+
+@keyframes screenShakeLateNight {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-10px, 5px); }
+  20% { transform: translate(8px, -8px); }
+  30% { transform: translate(-7px, 4px); }
+  40% { transform: translate(6px, -5px); }
+  50% { transform: translate(-5px, 6px); }
+  60% { transform: translate(5px, -3px); }
+  70% { transform: translate(-3px, 3px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Late-night Act 1 text — no glitch pseudo-elements, just stark white */
+#overlay.time-late-night .machine-text {
+  color: #909098;
+  text-shadow: none;
+}
+
+#overlay.time-late-night .machine-text.visible::before,
+#overlay.time-late-night .machine-text.visible::after {
+  opacity: 0;
+  animation: none;
+}
+
+/* Late-night grain is heavier throughout */
+#overlay.time-late-night #grain-canvas {
+  opacity: 0.1;
+}
+
+
+/* ===================== TIME-OF-DAY: MORNING ===================== */
+
+/* Warmer, amber vignette instead of red */
+#overlay.time-morning #act-4::after {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 50%,
+    rgba(60, 40, 0, 0.1) 75%,
+    rgba(30, 20, 0, 0.2) 100%
+  );
+  animation: none;
+  opacity: 0.8;
+}
+
+/* Gentler glitch */
+#overlay.time-morning.act4-active #glitch-canvas { opacity: 0.08; }
+
+/* Softer screen shake */
+#overlay.time-morning.act4-shake {
+  animation: screenShakeMorning 0.25s ease-out;
+}
+
+@keyframes screenShakeMorning {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(2px, -2px); }
+  75% { transform: translate(-1px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Morning figure gets warmer tones */
+#overlay.time-morning #wojak-haunting {
+  filter:
+    brightness(0.7)
+    contrast(1.2)
+    saturate(0.5)
+    sepia(0.1)
+    drop-shadow(0 0 20px rgba(180, 100, 0, 0.3))
+    drop-shadow(0 0 50px rgba(120, 70, 0, 0.1));
+  animation: hauntingPulseMorning 3s ease-in-out infinite alternate;
+}
+
+@keyframes hauntingPulseMorning {
+  0% {
+    filter:
+      brightness(0.7) contrast(1.2) saturate(0.5) sepia(0.1)
+      drop-shadow(0 0 20px rgba(180, 100, 0, 0.3))
+      drop-shadow(0 0 50px rgba(120, 70, 0, 0.1));
+  }
+  100% {
+    filter:
+      brightness(0.65) contrast(1.25) saturate(0.45) sepia(0.12)
+      drop-shadow(0 0 30px rgba(200, 120, 0, 0.4))
+      drop-shadow(0 0 70px rgba(150, 80, 0, 0.15));
+  }
+}
+
+/* Morning twitching is less intense */
+#overlay.time-morning.twitching #glitch-canvas { opacity: 0.35; }
+
+/* Morning Act 1 text — no glitch, warm and soft */
+#overlay.time-morning .machine-text {
+  color: #808070;
+  text-shadow: 0 0 8px rgba(200, 180, 100, 0.15);
+}
+
+#overlay.time-morning .machine-text.visible::before,
+#overlay.time-morning .machine-text.visible::after {
+  opacity: 0;
+  animation: none;
+}
+
+
+/* ===================== EARNED ENTRY TYPING SCREEN ===================== */
+
+#earned-entry-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #050510;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483647;
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+  font-family: 'Space Mono', monospace;
+}
+
+#earned-entry-screen.ee-visible {
+  opacity: 1;
+}
+
+#earned-entry-screen.ee-fade-out {
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+
+#earned-entry-prompt {
+  font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+  color: #353550;
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+  margin-bottom: 2.5rem;
+}
+
+#earned-entry-sentence {
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  line-height: 1.8;
+  text-align: center;
+  max-width: min(700px, 85vw);
+  user-select: none;
+}
+
+.ee-char {
+  color: #1a1a2a;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+  display: inline;
+}
+
+.ee-char.ee-correct {
+  color: #b0b0d0;
+  text-shadow: 0 0 8px rgba(140, 140, 220, 0.3);
+}
+
+.ee-char.ee-wrong {
+  color: #ff3333;
+  text-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+}
+
+#earned-entry-cursor {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: #404060;
+}
+
+.ee-cursor-blink {
+  animation: eeCursorBlink 1s step-end infinite;
+}
+
+@keyframes eeCursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Shake on wrong character */
+#earned-entry-screen.ee-shake {
+  animation: eeShake 0.3s ease-out;
+}
+
+@keyframes eeShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+/* Completion glow — all chars brighten, prompt/cursor vanish */
+#earned-entry-screen.ee-complete #earned-entry-sentence .ee-char.ee-correct {
+  color: #e0e0ff;
+  text-shadow: 0 0 20px rgba(180, 180, 255, 0.5);
+  transition: color 0.6s ease, text-shadow 0.6s ease;
+}
+
+#earned-entry-screen.ee-complete #earned-entry-prompt {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#earned-entry-screen.ee-complete #earned-entry-cursor {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}

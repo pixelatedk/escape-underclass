@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "Escape the Permanent Underclass",
+  "version": "3.0.0",
+  "description": "A cinematic reminder before you doom-scroll.",
+  "permissions": [
+    "webNavigation",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://twitter.com/*",
+    "*://www.twitter.com/*",
+    "*://x.com/*",
+    "*://www.x.com/*",
+    "*://instagram.com/*",
+    "*://www.instagram.com/*",
+    "*://tiktok.com/*",
+    "*://www.tiktok.com/*",
+    "*://youtube.com/*",
+    "*://www.youtube.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "interstitial.html",
+        "interstitial.css",
+        "interstitial.js",
+        "assets/wojak-phone.jpg",
+        "assets/wojak-frazzled.jpg",
+        "assets/wojak-deteriorated.jpg",
+        "assets/wojak-hopeful.jpg",
+        "assets/wojak-vr.jpg",
+        "assets/air-conditioner.mp3",
+        "assets/hope-1-tree.jpg",
+        "assets/hope-2-beach.jpg",
+        "assets/hope-3-painting.jpg",
+        "assets/hope-4-lake.jpg",
+        "assets/hope-5-alps.jpg",
+        "assets/hope-6-portofino.jpg",
+        "assets/hope-7-lakecomo.jpg",
+        "assets/hope-music.mp3"
+      ],
+      "matches": ["*://twitter.com/*", "*://www.twitter.com/*", "*://x.com/*", "*://www.x.com/*", "*://instagram.com/*", "*://www.instagram.com/*", "*://tiktok.com/*", "*://www.tiktok.com/*", "*://youtube.com/*", "*://www.youtube.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://twitter.com/*", "*://www.twitter.com/*", "*://x.com/*", "*://www.x.com/*", "*://instagram.com/*", "*://www.instagram.com/*", "*://tiktok.com/*", "*://www.tiktok.com/*", "*://youtube.com/*", "*://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

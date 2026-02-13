@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESCAPE</title>
+  <link rel="stylesheet" href="interstitial.css">
+</head>
+<body>
+  <div id="overlay">
+    <!-- FILM GRAIN — persistent analog texture across ALL acts -->
+    <canvas id="grain-canvas"></canvas>
+
+    <!-- Glitch canvas for Acts 4 & 5 -->
+    <canvas id="glitch-canvas"></canvas>
+
+    <!-- Scanlines overlay (visible in Acts 4 & 5) -->
+    <div id="scanlines"></div>
+
+    <!-- Cinematic letterbox bars -->
+    <div class="letterbox letterbox-top"></div>
+    <div class="letterbox letterbox-bottom"></div>
+
+    <!-- Scene transition bridge — solid black cover for seamless cuts -->
+    <div id="scene-bridge"></div>
+
+    <!-- AUDIO -->
+    <audio id="audio-ambient" loop preload="auto"></audio>
+    <audio id="audio-hope" preload="auto"></audio>
+
+    <!-- ==================== ACT 1 & 2: Wojak Deterioration ==================== -->
+    <div id="act-1" class="act-scene">
+      <div id="act1-text" class="machine-text" data-text="u right now">u right now</div>
+      <div id="wojak-stage">
+        <img id="wojak-frame-1" class="wojak-frame" src="" alt="">
+        <img id="wojak-frame-2" class="wojak-frame" src="" alt="">
+        <img id="wojak-frame-3" class="wojak-frame" src="" alt="">
+      </div>
+    </div>
+
+    <!-- ==================== ACT 3: Happiness Collage ==================== -->
+    <div id="act-3" class="act-scene">
+      <div id="collage-surface"></div>
+      <div id="act3-text" class="hope-text">everything you're looking for is outside the computer</div>
+    </div>
+
+    <!-- ==================== ACT 3.5: Hopeful Wojak Beat ==================== -->
+    <div id="act-hope" class="act-scene">
+      <div id="hope-wojak-stage">
+        <img id="wojak-hopeful" class="wojak-frame" src="" alt="">
+      </div>
+      <div id="hope-caption">...you see it now?</div>
+    </div>
+
+    <!-- ==================== ACT 4: The Haunting Figure ==================== -->
+    <div id="act-4" class="act-scene">
+      <div id="figure-container">
+        <div id="the-figure">
+          <img id="wojak-haunting" src="" alt="">
+        </div>
+
+        <div id="message-container">
+          <div id="message-glitch" class="glitch-text" data-text="$600 million in human capital">$600 million in human capital</div>
+          <div id="message-sub">is invested to keep you hooked on this site.</div>
+          <div id="message-warning">
+            <span class="flicker">Have fun in the permanent underclass.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Act 5 reuses Act 4 DOM — JS adds twitching/dissolving classes -->
+  </div>
+
+  <script src="interstitial.js"></script>
+</body>
+</html>

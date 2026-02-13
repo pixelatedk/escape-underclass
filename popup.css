@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 320px;
+  min-height: 200px;
+  background: #0a0a14;
+  font-family: 'Space Mono', monospace;
+  color: #c0c0d0;
+  overflow-x: hidden;
+}
+
+.popup-container {
+  padding: 20px 18px;
+}
+
+/* ===================== HEADER ===================== */
+header {
+  margin-bottom: 18px;
+}
+
+header h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e0e0f0;
+  letter-spacing: 0.15em;
+  text-transform: lowercase;
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  color: #606080;
+  letter-spacing: 0.1em;
+  margin-top: 3px;
+}
+
+/* ===================== PHOTO GRID ===================== */
+#photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+#photo-grid:empty {
+  display: none;
+}
+
+.photo-thumb {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #151520;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  color: #ff6060;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.photo-thumb:hover .photo-remove {
+  opacity: 1;
+}
+
+.photo-remove:hover {
+  background: rgba(255, 50, 50, 0.3);
+  color: #ff8080;
+}
+
+/* ===================== DROP ZONE ===================== */
+#drop-zone {
+  border: 2px dashed #2a2a40;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  margin-bottom: 12px;
+}
+
+#drop-zone:hover,
+#drop-zone.drag-over {
+  border-color: #5050a0;
+  background: rgba(80, 80, 160, 0.06);
+}
+
+#drop-zone.full {
+  opacity: 0.35;
+  pointer-events: none;
+  border-color: #1a1a2a;
+}
+
+.drop-zone-inner {
+  pointer-events: none;
+}
+
+.drop-icon {
+  font-size: 1.8rem;
+  color: #404060;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.drop-text {
+  font-size: 0.75rem;
+  color: #707090;
+  letter-spacing: 0.08em;
+}
+
+.drop-sub {
+  font-size: 0.6rem;
+  color: #404060;
+  margin-top: 3px;
+  letter-spacing: 0.06em;
+}
+
+/* ===================== STATUS BAR ===================== */
+.status-bar {
+  font-size: 0.7rem;
+  color: #505070;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+#photo-count {
+  color: #8080b0;
+  font-weight: 700;
+}
+
+/* ===================== HINT ===================== */
+.hint {
+  font-size: 0.62rem;
+  color: #6a6a88;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ===================== DIVIDER ===================== */
+.divider {
+  height: 1px;
+  background: #1a1a2a;
+  margin: 16px 0;
+}
+
+/* ===================== BLOCKED SITES ===================== */
+.sites-section {
+  margin-top: 2px;
+}
+
+.sites-label {
+  font-size: 0.7rem;
+  color: #606080;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  text-transform: lowercase;
+}
+
+.site-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+}
+
+.site-toggle + .site-toggle {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.site-name {
+  font-size: 0.78rem;
+  color: #9090b0;
+  letter-spacing: 0.04em;
+}
+
+/* ===================== TOGGLE SWITCH ===================== */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #1a1a2a;
+  border-radius: 20px;
+  border: 1px solid #2a2a3a;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #404060;
+  border-radius: 50%;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.toggle input:checked + .toggle-slider {
+  background: rgba(100, 80, 200, 0.25);
+  border-color: #5050a0;
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(16px);
+  background: #8080c0;
+}
+
+/* ===================== SETTING HINT ===================== */
+.setting-hint {
+  font-size: 0.58rem;
+  color: #505068;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+  padding-left: 2px;
+}

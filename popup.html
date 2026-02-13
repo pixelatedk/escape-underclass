@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape the Permanent Underclass</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header>
+      <h1>escape</h1>
+      <p class="subtitle">your happiness collage</p>
+    </header>
+
+    <div id="photo-grid"></div>
+
+    <div id="drop-zone">
+      <div class="drop-zone-inner">
+        <div class="drop-icon">+</div>
+        <p class="drop-text">drag photos here</p>
+        <p class="drop-sub">or click to browse</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*" multiple hidden>
+    </div>
+
+    <div class="status-bar">
+      <span id="photo-count">0</span>/8 custom photos
+    </div>
+
+    <p class="hint">your photos replace the default collage images.</p>
+
+    <div class="divider"></div>
+
+    <div class="sites-section">
+      <p class="sites-label">blocked sites</p>
+
+      <div class="site-toggle" data-site="instagram">
+        <span class="site-name">Instagram</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-instagram">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="site-toggle" data-site="x">
+        <span class="site-name">X</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-x" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="site-toggle" data-site="tiktok">
+        <span class="site-name">TikTok</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-tiktok">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="site-toggle" data-site="youtube">
+        <span class="site-name">YouTube</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-youtube">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="settings-section">
+      <p class="sites-label">settings</p>
+
+      <div class="site-toggle" data-setting="earnedEntry">
+        <span class="site-name">earned entry</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-earned-entry" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <p class="setting-hint">type a sentence before the site loads</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
